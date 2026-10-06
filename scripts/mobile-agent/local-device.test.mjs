@@ -94,6 +94,7 @@ test('local replacement verifies exact field without replay on mismatch', async 
     let writes = 0;
     const device = new LocalAndroidDevice({ deviceId: 'test' });
     device.assertReady = async () => {};
+    device.assertIdentity = async () => {};
     const before = {
       deviceId: 'test',
       observedAt: Date.now(),
@@ -121,5 +122,25 @@ test('local replacement verifies exact field without replay on mismatch', async 
     if (correct) assert.equal((await run).verified, true);
     else await assert.rejects(run, /Do not replay/);
     assert.equal(writes, 1);
+  }
+});
+
+test('physical tablet identity mismatch rejects an action before mutation', async () => {
+  const old = process.env.AGENT_DEVICE_IDENTITY;
+  process.env.AGENT_DEVICE_IDENTITY = 'pinned';
+  let mutations = 0;
+  try {
+    const d = new LocalAndroidDevice({
+      deviceId: 'endpoint',
+      runner: async () => ({ stdout: 'another' }),
+    });
+    d.api = async () => {
+      mutations++;
+    };
+    await assert.rejects(d.act({ type: 'global', name: 'home' }), /pinned physical tablet/);
+    assert.equal(mutations, 0);
+  } finally {
+    if (old === undefined) delete process.env.AGENT_DEVICE_IDENTITY;
+    else process.env.AGENT_DEVICE_IDENTITY = old;
   }
 });

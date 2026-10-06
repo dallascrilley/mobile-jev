@@ -60,6 +60,7 @@ export class LocalAndroidDevice extends MobilerunDevice {
     this.baseUrl = 'adb://local';
   }
   async act(action, options = {}) {
+    await this.assertIdentity();
     const replacement =
       action?.type === 'clear' || (action?.type === 'type' && action.clear === true);
     let verification;
@@ -118,7 +119,13 @@ export class LocalAndroidDevice extends MobilerunDevice {
     const output = await this.shell(parts);
     return values ? parseMutationResult(output) : parseContent(output);
   }
+  async assertIdentity() {
+    const identity = (process.env.AGENT_DEVICE_IDENTITY || '').trim();
+    if (identity && (await this.shell(['getprop', 'ro.serialno'])).trim() !== identity)
+      throw new Error('ADB transport does not match the pinned physical tablet.');
+  }
   async assertReady() {
+    await this.assertIdentity();
     if ((await this.adb(['get-state'])).trim() !== 'device')
       throw new Error('Tablet is disconnected.');
     const version = await this.content('version');

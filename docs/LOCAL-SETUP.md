@@ -35,7 +35,7 @@ The service implements `GET /health`, `/devices`, `/apps`, `/observe`, and `/scr
 
 Each service device operation uses the common device lock. A task worker holds that same lock for its complete run, from before policy creation until the run ends. Do not treat a lock conflict as permission to send the operation through another interface. Read-only readiness checks can retry transient Portal errors; mutations are not retried automatically. An optional `TABLET_RECOVER_BIN` absolute path enables the recovery endpoint. Recovery runs that configured executable without a shell and under the shared lock.
 
-The service runs in the foreground with `pnpm service`. Durable macOS launch and restart behavior belongs to the host provisioning repository. This repository does not install or register a LaunchAgent.
+The Android service runs in the foreground with `pnpm service`. Durable Android service startup belongs to the host provisioning repository. For physical iPhone and iPad support, use the separate [iOS supervisor and setup](IOS-SETUP.md).
 
 ## Cloud Mobilerun mode
 

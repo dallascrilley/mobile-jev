@@ -7,7 +7,7 @@ export type Device = {
   streamUrl: string | null;
   streamToken: string | null;
   environment: string;
-  backend?: 'local' | 'cloud';
+  backend?: 'local' | 'ios' | 'cloud';
 };
 export type Event = {
   type: 'decision' | 'action' | 'result' | 'error';

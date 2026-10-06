@@ -12,7 +12,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
     checkRequest(request);
     const { path } = await context.params;
     if (path[0] === 'local') {
-      if (process.env.MOBILE_DEVICE_BACKEND !== 'local')
+      if (!['local', 'ios'].includes(process.env.MOBILE_DEVICE_BACKEND || ''))
         throw new StudioError('Local device mode is not enabled.', 404);
       const endpoint = path.slice(1).join('/');
       if (
@@ -38,7 +38,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       });
     }
     if (request.method === 'GET' && path.join('/') === 'device') {
-      if (process.env.MOBILE_DEVICE_BACKEND === 'local') {
+      if (['local', 'ios'].includes(process.env.MOBILE_DEVICE_BACKEND || '')) {
         const response = await fetch(`${localService()}/health`, { cache: 'no-store' });
         const health = await response.json();
         if (!response.ok)
@@ -48,7 +48,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
           streamUrl: null,
           streamToken: null,
           environment: 'Local',
-          backend: 'local',
+          backend: process.env.MOBILE_DEVICE_BACKEND,
         });
       }
       const client = new MobilerunDevice();
@@ -71,7 +71,7 @@ async function handle(request: Request, context: { params: Promise<{ path: strin
       if (
         !process.env.MOBILERUN_API_KEY &&
         !process.env.MOBILERUN_CLOUD_API_KEY &&
-        process.env.MOBILE_DEVICE_BACKEND !== 'local'
+        !['local', 'ios'].includes(process.env.MOBILE_DEVICE_BACKEND || '')
       )
         throw new StudioError('Mobilerun credentials are missing on the server.', 503);
       if ((body.backend || 'jev') === 'jev' && !process.env.TYPESAFE_API_KEY)

@@ -100,7 +100,7 @@ export function buildQuestions(observation, texts = [], apps = []) {
   for (const operation of Object.keys(controls))
     operations[operation] = {
       BACK: 'Navigate back one screen.',
-      HOME: 'Go to the Android launcher home screen.',
+      HOME: 'Go to the device home screen.',
       ENTER: 'Press Enter to submit the focused input.',
     }[operation];
   Object.assign(operations, {

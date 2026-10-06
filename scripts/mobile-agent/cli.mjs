@@ -28,8 +28,8 @@ Commands:
   run GOAL                       Preview a TypeSafe decision; --execute runs the loop
 
 Options:
-  --device ID                    Or ADB_SERIAL / MOBILERUN_DEVICE_ID
-  --device-backend local|mobilerun Transport selection
+  --device ID                    Or ADB_SERIAL / MOBILERUN_DEVICE_ID / IOS_DEVICE_UDID
+  --device-backend local|mobilerun|ios Transport selection (ios is never inferred)
   --backend jev|rizzo|tev1         Decision provider
   --out PATH                     Save observe JSON or screenshot PNG
   --snapshot PATH                Original observe JSON for tap-element
@@ -43,6 +43,8 @@ Options:
   --trace PATH                   Save model requests, responses, actions, and final state (JSONL)
 
 Keys: MOBILERUN_API_KEY (or MOBILERUN_CLOUD_API_KEY); TYPESAFE_API_KEY for run.
+iOS: set IOS_DEVICE_UDID, IOS_WDA_URL (loopback), IOS_WDA_BINDING_FILE and optionally
+IOS_WDA_SESSION_ID. iOS supports home, enter and delete only; back, recent and tab are rejected.
 Direct commands execute immediately. Run sends goal and UI text to TypeSafe.
 `;
 
@@ -82,9 +84,13 @@ async function main() {
     if (args.length < min || args.length > max)
       throw new Error(`Invalid arguments for ${command}. Use --help.`);
   };
+  const deviceBackend = values['device-backend'] || process.env.MOBILE_DEVICE_BACKEND;
   const device = createDevice({
     backend: values['device-backend'],
-    deviceId: values.device || process.env.ADB_SERIAL || process.env.MOBILERUN_DEVICE_ID,
+    deviceId:
+      deviceBackend === 'ios'
+        ? values.device || process.env.IOS_DEVICE_UDID
+        : values.device || process.env.ADB_SERIAL || process.env.MOBILERUN_DEVICE_ID,
     textCompletionMode: values['text-completion'],
   });
   const mutation =
@@ -102,7 +108,11 @@ async function main() {
     if (command === 'profile') {
       arity(0);
       const metrics = [];
-      device.request = measuredRequest({ service: 'mobilerun', metrics });
+      device.request = measuredRequest({
+        service: device.backend === 'ios' ? 'wda' : 'mobilerun',
+        metrics,
+        request: device.request,
+      });
       await device.assertReady();
       for (let i = 0; i < 5; i++) await device.observe();
       const report = {
@@ -143,7 +153,12 @@ async function main() {
       };
       const metrics = [];
       const onMetric = async (metric) => record({ event: 'request_timing', ...metric });
-      device.request = measuredRequest({ service: 'mobilerun', metrics, onMetric });
+      device.request = measuredRequest({
+        service: device.backend === 'ios' ? 'wda' : 'mobilerun',
+        metrics,
+        onMetric,
+        request: device.request,
+      });
       const modelRequest = measuredRequest({
         service: 'typesafe',
         metrics,

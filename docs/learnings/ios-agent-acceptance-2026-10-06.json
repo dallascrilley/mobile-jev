@@ -1,0 +1,187 @@
+{
+  "date": "2026-10-06",
+  "scope": "iOS integration diagnostics; not scored Android/model comparison",
+  "device": "DeviPhone11",
+  "blocked_device": {
+    "name": "Kami’s iPad",
+    "reason": "CoreDevice 10003 / RemotePairing 1016: not unlocked recently",
+    "tested": false,
+    "config_staged": true,
+    "launch_agent_loaded": false
+  },
+  "pins": {
+    "source_parent_revision": "2f9a82c",
+    "wda_revision": "381e75ce6ad1afb97b46cc3aa72e758193af1353",
+    "wda_version": "12.2.0",
+    "xcode": "27.0 (27A266a)",
+    "ios": "27.0.1 (24A446)",
+    "node": "26.8.2",
+    "iproxy": "2.1.1",
+    "model": "jev-1.13.0",
+    "fixture_binary_sha256": "bd7b73ec7c5ba7df1cffb9071aad9db72169d5a78bb70faf69393c59f5e7a94d",
+    "wda_runner_binary_sha256": "b8a1ab1b4dbfcca2ba0d8fc03ccd6c18ab09ca47c0a8a69c1cff9cf6fdf03443",
+    "source_sha256": {
+      "scripts/mobile-agent/ios-device.mjs": "74b75d7cb00bd6cbdb6507f56d653f5233dddbb8688d4f24cea359f6afcb0c12",
+      "scripts/mobile-agent/policy.mjs": "cec89acb69b772f8f8274220771aceb64249df9f79b13d5d0c17ddd7b5e859e8",
+      "scripts/mobile-agent/actions.mjs": "4804c26d35076998e0245ee8b736d2a2501d58da6dc0391b6cb05e03884b4454",
+      "scripts/ios-runtime.mjs": "e5913e27b9ffa1afe981f1201ceaaa6fd8ef1453e6264b7dc5f1816e0a884c89",
+      "scripts/install-ios-service.mjs": "34ddb07316410df2340b9ab6b0aabdf021f3c52e8d98a1071ee7cb296e592806",
+      "scripts/device-service.mjs": "57bd4732355799d6cb9b276d40b0a7673c2f41abd0f6f3afd26efb80773769f2",
+      "fixtures/ios-agent/Sources/AdditionCalculator.swift": "b8ef23024af5073d6f2e507926847c24780f404cb34f2c1e38225caab2b98b73",
+      "fixtures/ios-agent/Sources/AgentDeviceFixtureApp.swift": "61059b17aae072a8de2eabdf602cfe0dd2df51c6f5e8e8265bcc6c032908e93b",
+      "fixtures/ios-agent/Sources/CalculatorScreen.swift": "7e2b9cadef953fd00dfc63b992a17fe381b45f73ca3e7fdfaba1b15ea59ce46b",
+      "fixtures/ios-agent/Sources/FixtureState.swift": "3f261be5c0353714748560107e241f8b277b2d23a33e23bc5cb3210f06e67511",
+      "fixtures/ios-agent/Sources/FormScreen.swift": "f0c84fc42cccb0c86d4ed5a49ba5e4681f949c7b203dd94255f62cd4b1e986c5"
+    }
+  },
+  "diagnostics": [
+    {
+      "name": "form-initial",
+      "verified": false,
+      "actions": 11,
+      "reason": "Option B not selected; keyboard/scroll sequencing missed it",
+      "rescued": false
+    },
+    {
+      "name": "form-separate-recovery",
+      "verified": true,
+      "name_value": "Ada Ω",
+      "notes_value": "line one\n137 + 248 = 385",
+      "choice_value": "Option B",
+      "method": "fresh in-app Back and scrolling; exact review readback"
+    },
+    {
+      "name": "calculator",
+      "verified": true,
+      "actions": 10,
+      "input": "137 + 248",
+      "result": "385",
+      "fixture": true
+    },
+    {
+      "name": "jev-toggle-before-repair",
+      "verified": false,
+      "actions": 1,
+      "status": "blocked",
+      "outcome": "stuck",
+      "reason": "Row-center pointer missed native Switch"
+    },
+    {
+      "name": "jev-toggle-after-repair",
+      "verified": true,
+      "actions": 1,
+      "status": "succeeded",
+      "outcome": "done",
+      "task_ms": 8093,
+      "fresh_process_and_empty_task_history": true,
+      "baseline_off": true,
+      "fixture_app_theme_only": true
+    },
+    {
+      "name": "service-home-first-check",
+      "verified": false,
+      "reason": "Concurrent task-owned fixture reset changed foreground; recorded guard refusal",
+      "rescued": false
+    },
+    {
+      "name": "service-home-separate-check",
+      "verified": true,
+      "wrong_device_http": 409,
+      "reused_observation_http": 409
+    },
+    {
+      "name": "extension-client-live-service",
+      "result": {
+        "health": true,
+        "inventoryCount": 87,
+        "screenshotPng": true,
+        "recovery": {
+          "recovered": true
+        },
+        "contention": "busy",
+        "during": "running",
+        "cancelled": true,
+        "finalReady": true,
+        "target": "DeviPhone11"
+      }
+    },
+    {
+      "name": "studio-api",
+      "result": {
+        "device": "DeviPhone11",
+        "backend": "ios",
+        "noCloudStream": true,
+        "health": true,
+        "observation": true,
+        "screenshot": true,
+        "hostUiObserved": false
+      }
+    },
+    {
+      "name": "studio-start-status-stop",
+      "result": {
+        "started": true,
+        "cancelled": true,
+        "status": "stopped",
+        "backend": "jev"
+      }
+    },
+    {
+      "name": "cold-service-launch-before-inventory-repair",
+      "verified": false,
+      "reason": "Empty installed-app cache caused pre-dispatch launch rejection after service restart.",
+      "repair": "Each app launch now reads exact-device installed inventory; offline cold/stale inventory checks and final live launch passed."
+    },
+    {
+      "name": "jev-toggle-final-hardened-adapter",
+      "verified": true,
+      "actions": 1,
+      "status": "succeeded",
+      "outcome": "done",
+      "task_ms": 9522,
+      "fresh_process_and_empty_task_history": true,
+      "baseline_off": true,
+      "fixture_app_theme_only": true
+    }
+  ],
+  "checks": {
+    "mobile_jev_tests": 167,
+    "mobile_jev_pnpm_check": "passed",
+    "ios_extension_tests": 50,
+    "ios_extension_full_check": "passed",
+    "supervised_service_health": "passed",
+    "runtime_verify": "passed",
+    "ios_extension_host_import": "passed",
+    "ios_guest_ui": "blocked: guest start deferred twice at 8.5 and 8.4 GiB available; 10 GiB required",
+    "host_ui_observed": false,
+    "raycast_agent_activation": "unverified; no guest AI account",
+    "review_guards": {
+      "automatic_redirects": "rejected for runtime session/readiness/verification and installer health; 307/308 receive zero destination requests",
+      "native_switch_revalidation": "bounded resolution and final state/geometry/age check; changed or expired targets receive zero clicks",
+      "device_identity_body": "recovery and cancellation reject supplied wrong identities before dispatch"
+    },
+    "live_wrong_body_identity_http": {
+      "android_recovery": 409,
+      "android_cancel": 409,
+      "ios_recovery": 409,
+      "ios_cancel": 409
+    },
+    "independent_guard_review": "clear after redirect, bounded switch revalidation, and fresh app inventory repairs"
+  },
+  "limits": [
+    "Diagnostics use synthetic native fixture; not native Calculator, Settings, Safari or OS-theme proof.",
+    "Model DONE is distinct from independent observed toggle readback.",
+    "No measured iOS cold-load comparison or reliability estimate.",
+    "Original failures retained; repairs are separate integration checks.",
+    "Service-process restart loses in-memory task history.",
+    "Read-only API checks and failed same-origin/lock requests caused no device input."
+  ],
+  "restoration": {
+    "android_keyboard": "Samsung HoneyBoard verified active",
+    "android_dark_theme": "on",
+    "android_screen_timeout_ms": 600000,
+    "iphone_original_foreground": "restored at cleanup",
+    "iphone_fixture": "uninstalled at cleanup",
+    "ios_keyboard_or_system_settings_changed": false
+  }
+}

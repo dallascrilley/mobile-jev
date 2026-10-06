@@ -5,8 +5,9 @@ export function candidatesFor(observation, texts = []) {
       actions[`tap_${node.id}`] = { type: 'tap-element', elementId: node.id };
     }
   }
-  actions.back = { type: 'global', name: 'back' };
-  actions.home = { type: 'global', name: 'home' };
+  const globals = observation.capabilities?.globalActions;
+  if (!globals || globals.includes('back')) actions.back = { type: 'global', name: 'back' };
+  if (!globals || globals.includes('home')) actions.home = { type: 'global', name: 'home' };
   // Derive gestures from each scrollable region instead of assuming a full-screen list.
   const scrollBounds = new Set();
   const scrollable = observation.elements.filter((e) => e.enabled && e.scrollable);
@@ -49,7 +50,8 @@ export function candidatesFor(observation, texts = []) {
     }
   }
   if (observation.phone.isEditable) {
-    actions.enter = { type: 'key', key: 'enter' };
+    if (!observation.capabilities?.keys || observation.capabilities.keys.includes('enter'))
+      actions.enter = { type: 'key', key: 'enter' };
     if (
       !observation.elements.some(
         (node) => node.password && (node.focused || node.id === observation.phone.inputElementId),

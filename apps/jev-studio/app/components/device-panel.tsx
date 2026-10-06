@@ -19,7 +19,8 @@ export function DevicePanel({ state }: { state: StudioState }) {
     localFrame,
     manualAction,
   } = state;
-  const local = device?.backend === 'local';
+  const ios = device?.backend === 'ios';
+  const local = device?.backend === 'local' || ios;
   return (
     <section className="device-column">
       <div className="device-heading">
@@ -65,7 +66,7 @@ export function DevicePanel({ state }: { state: StudioState }) {
               <img
                 className="local-device-image"
                 src={`/api/studio/local/screenshot?frame=${localFrame}`}
-                alt="Current local Android device screen"
+                alt="Current local device screen"
                 onLoad={() => setConnected(true)}
                 onError={() => setConnected(false)}
               />
@@ -87,7 +88,7 @@ export function DevicePanel({ state }: { state: StudioState }) {
           <button
             aria-label="Android back"
             title="Back"
-            disabled={!connected || busy}
+            disabled={!connected || busy || ios}
             onClick={() =>
               local
                 ? void manualAction({ type: 'global', name: 'back' })
@@ -97,7 +98,7 @@ export function DevicePanel({ state }: { state: StudioState }) {
             <ArrowLeft size={17} />
           </button>
           <button
-            aria-label="Android home"
+            aria-label="Device home"
             title="Home"
             disabled={!connected || busy}
             onClick={() =>
@@ -111,7 +112,7 @@ export function DevicePanel({ state }: { state: StudioState }) {
           <button
             aria-label="Android recent apps"
             title="Recent apps"
-            disabled={!connected || busy}
+            disabled={!connected || busy || ios}
             onClick={() =>
               local
                 ? void manualAction({ type: 'global', name: 'recent' })
@@ -128,7 +129,7 @@ export function DevicePanel({ state }: { state: StudioState }) {
         <div className="stage-caption">
           <i />
           {busy ? 'Agent in control' : 'Touch & keyboard enabled'}
-          <span>ANDROID · {local ? 'LOCAL ADB' : 'MOBILERUN'}</span>
+          <span>{ios ? 'iOS · LOCAL WDA' : `ANDROID · ${local ? 'LOCAL ADB' : 'MOBILERUN'}`}</span>
         </div>
       </div>
     </section>

@@ -23,6 +23,14 @@ test('service rejects another device identity before observation or mutation', a
   });
   assert.equal(response.status, 409);
   assert.equal(fixture.calls.length, 0);
+  for (const path of ['/recover', '/runs/aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee/stop', '/runs']) {
+    const rejected = await fetch(`${fixture.base}${path}`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ deviceId: 'other', goal: 'Open Settings', backend: 'rizzo' }),
+    });
+    assert.equal(rejected.status, 409, `${path} refuses another device before dispatch`);
+  }
 });
 
 async function startServer(options = {}) {

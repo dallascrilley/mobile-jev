@@ -164,43 +164,44 @@ test('studio run carries the selected provider and stops the worker at its time 
   assert.throws(() => store.start({ goal: 'Open Settings', backend: 'unknown' }), /backend/);
 });
 
-test('local provider workers do not inherit unused hosted credentials', () => {
-  const saved = Object.fromEntries(
-    [
-      'MOBILE_DEVICE_BACKEND',
-      'MOBILERUN_API_KEY',
-      'MOBILERUN_CLOUD_API_KEY',
-      'TYPESAFE_API_KEY',
-    ].map((key) => [key, process.env[key]]),
-  );
-  let workerOptions;
-  const child = new EventEmitter();
-  child.stdout = new PassThrough();
-  child.stderr = new PassThrough();
-  child.stdin = new PassThrough();
-  child.kill = () => {};
-  try {
-    process.env.MOBILE_DEVICE_BACKEND = 'local';
-    process.env.MOBILERUN_API_KEY = 'cloud-device-secret';
-    process.env.MOBILERUN_CLOUD_API_KEY = 'cloud-fallback-secret';
-    process.env.TYPESAFE_API_KEY = 'hosted-decision-secret';
-    const store = createStore({
-      spawnTask: (_command, _args, options) => ((workerOptions = options), child),
-    });
-    const run = store.start({ goal: 'Open Settings', backend: 'rizzo' });
-    assert.equal(run.status, 'running');
-    assert.equal(workerOptions.env.MOBILERUN_API_KEY, undefined);
-    assert.equal(workerOptions.env.MOBILERUN_CLOUD_API_KEY, undefined);
-    assert.equal(workerOptions.env.TYPESAFE_API_KEY, undefined);
-    store.stop(run.id);
-    child.emit('close', null);
-  } finally {
-    for (const [key, value] of Object.entries(saved)) {
-      if (value === undefined) delete process.env[key];
-      else process.env[key] = value;
+for (const deviceBackend of ['local', 'ios'])
+  test(`${deviceBackend} provider workers do not inherit unused hosted credentials`, () => {
+    const saved = Object.fromEntries(
+      [
+        'MOBILE_DEVICE_BACKEND',
+        'MOBILERUN_API_KEY',
+        'MOBILERUN_CLOUD_API_KEY',
+        'TYPESAFE_API_KEY',
+      ].map((key) => [key, process.env[key]]),
+    );
+    let workerOptions;
+    const child = new EventEmitter();
+    child.stdout = new PassThrough();
+    child.stderr = new PassThrough();
+    child.stdin = new PassThrough();
+    child.kill = () => {};
+    try {
+      process.env.MOBILE_DEVICE_BACKEND = deviceBackend;
+      process.env.MOBILERUN_API_KEY = 'cloud-device-secret';
+      process.env.MOBILERUN_CLOUD_API_KEY = 'cloud-fallback-secret';
+      process.env.TYPESAFE_API_KEY = 'hosted-decision-secret';
+      const store = createStore({
+        spawnTask: (_command, _args, options) => ((workerOptions = options), child),
+      });
+      const run = store.start({ goal: 'Open Settings', backend: 'rizzo' });
+      assert.equal(run.status, 'running');
+      assert.equal(workerOptions.env.MOBILERUN_API_KEY, undefined);
+      assert.equal(workerOptions.env.MOBILERUN_CLOUD_API_KEY, undefined);
+      assert.equal(workerOptions.env.TYPESAFE_API_KEY, undefined);
+      store.stop(run.id);
+      child.emit('close', null);
+    } finally {
+      for (const [key, value] of Object.entries(saved)) {
+        if (value === undefined) delete process.env[key];
+        else process.env[key] = value;
+      }
     }
-  }
-});
+  });
 
 test('output overflow keeps ownership until worker exit and rejects a second task', () => {
   const { child, store } = fixture();

@@ -103,7 +103,7 @@ export function createStore({
       let child;
       try {
         const taskEnv = { ...process.env };
-        if (taskEnv.MOBILE_DEVICE_BACKEND === 'local') {
+        if (['local', 'ios'].includes(taskEnv.MOBILE_DEVICE_BACKEND)) {
           delete taskEnv.MOBILERUN_API_KEY;
           delete taskEnv.MOBILERUN_CLOUD_API_KEY;
         }

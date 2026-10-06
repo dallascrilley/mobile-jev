@@ -56,7 +56,7 @@ function validateRequest(request) {
   return origin || undefined;
 }
 
-async function readJson(request) {
+async function readJson(request, { allowEmpty = false } = {}) {
   const chunks = [];
   let size = 0;
   for await (const chunk of request) {
@@ -64,6 +64,7 @@ async function readJson(request) {
     if (size > MAX_BODY_BYTES) throw new DeviceServiceError('Request body is too large.', 413);
     chunks.push(chunk);
   }
+  if (allowEmpty && size === 0) return {};
   try {
     return JSON.parse(Buffer.concat(chunks).toString('utf8'));
   } catch {
@@ -219,7 +220,7 @@ export function createDeviceServer({
   device,
   acquireDeviceLock,
   spawnProcess = spawn,
-  recoverBin = process.env.TABLET_RECOVER_BIN,
+  recoverBin = device?.backend === 'ios' ? undefined : process.env.TABLET_RECOVER_BIN,
   policy = new TypeSafePolicy({ backend: process.env.DECISION_BACKEND || 'rizzo' }),
   store = createStore({
     runner: fileURLToPath(new URL('./mobile-agent/web-runner.mjs', import.meta.url)),
@@ -253,7 +254,7 @@ export function createDeviceServer({
       const url = new URL(request.url || '/', 'http://localhost');
       const requestedId = url.searchParams.get('deviceId');
       if (requestedId && requestedId !== device.deviceId)
-        throw new DeviceServiceError('This service controls only its configured tablet.', 409);
+        throw new DeviceServiceError('This service controls only its configured device.', 409);
       if (request.method === 'GET' && url.pathname === '/health') {
         const state = await withLock(lockProvider, id, () =>
           retryReadOnlyReadiness(() => device.assertReady()),
@@ -269,6 +270,7 @@ export function createDeviceServer({
             runtime: {
               node: process.execPath,
               adb: device.adbBin || null,
+              wda: device.backend === 'ios' ? device.baseUrl : null,
               mobileJev: fileURLToPath(new URL('../', import.meta.url)),
               recovery: recoverBin || null,
             },
@@ -313,7 +315,7 @@ export function createDeviceServer({
       if (request.method === 'POST' && url.pathname === '/actions') {
         const body = await readJson(request);
         if (body?.deviceId && body.deviceId !== device.deviceId)
-          throw new DeviceServiceError('This service controls only its configured tablet.', 409);
+          throw new DeviceServiceError('This service controls only its configured device.', 409);
         const action = validateAction(body?.action);
         let expected;
         if (action.type !== 'open-app') {
@@ -332,7 +334,12 @@ export function createDeviceServer({
         return;
       }
       if (request.method === 'POST' && url.pathname === '/recover') {
-        await runRecovery({ binary: recoverBin, spawnProcess, lock: lockProvider, id });
+        const body = await readJson(request, { allowEmpty: true });
+        if (body?.deviceId && body.deviceId !== device.deviceId)
+          throw new DeviceServiceError('This service controls only its configured device.', 409);
+        if (device.backend === 'ios') {
+          await withLock(lockProvider, id, () => device.assertReady());
+        } else await runRecovery({ binary: recoverBin, spawnProcess, lock: lockProvider, id });
         sendJson(response, 200, { recovered: true }, corsOrigin);
         return;
       }
@@ -343,7 +350,7 @@ export function createDeviceServer({
       if (request.method === 'POST' && url.pathname === '/runs') {
         const body = await readJson(request);
         if (body?.deviceId && body.deviceId !== device.deviceId)
-          throw new DeviceServiceError('This service controls only its configured tablet.', 409);
+          throw new DeviceServiceError('This service controls only its configured device.', 409);
         if (!body || typeof body !== 'object' || Array.isArray(body))
           throw new DeviceServiceError('Run request must be a JSON object.');
         sendJson(response, 201, store.start(body), corsOrigin);
@@ -353,6 +360,9 @@ export function createDeviceServer({
       if (match) {
         const [, runId, stop] = match;
         if (request.method === 'POST' && stop) {
+          const body = await readJson(request, { allowEmpty: true });
+          if (body?.deviceId && body.deviceId !== device.deviceId)
+            throw new DeviceServiceError('This service controls only its configured device.', 409);
           sendJson(response, 200, store.stop(runId), corsOrigin);
           return;
         }

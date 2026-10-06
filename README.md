@@ -6,13 +6,13 @@
 
 **One goal. A real Android phone. Jev makes the decisions.**
 
-A standalone mobile agent for [Mobilerun](https://mobilerun.ai) or a local Android device, powered by [TypeSafe's Jev](https://docs.typesafe.ai/) and selectable decision providers. It includes a live React studio, a CLI, execution traces, and request-level latency measurements. Cloud mode uses Mobilerun; local mode uses ADB and the device's Mobilerun Portal app.
+A standalone mobile agent for [Mobilerun](https://mobilerun.ai), local Android, or a physical iPhone/iPad, powered by [TypeSafe's Jev](https://docs.typesafe.ai/) and selectable decision providers. It includes a React studio, CLI, device service, execution traces, and latency measurements. Android uses ADB and local Portal; iOS uses an owned, signed WebDriverAgent runner. See [iOS setup](docs/IOS-SETUP.md).
 
 [Mobilerun](https://mobilerun.ai) · [Mobilerun docs](https://docs.mobilerun.ai) · [TypeSafe](https://typesafe.ai) · [Jev docs](https://docs.typesafe.ai) · [Local setup and service](docs/LOCAL-SETUP.md) · [Demo guide](docs/DEMO.md)
 
 ## Run it
 
-Requirements: **Node.js 24 recommended** (22.16+ supported), **pnpm 10.30.1**, and **curl 7.70+**. Select either a ready Mobilerun device or an ADB-connected local Android device. Jev requires a TypeSafe API key; Rizzo is the default decision provider for studio tasks. Tested locally on macOS; CI runs offline tests and the build on Linux.
+Requirements: **Node.js 24 recommended** (22.16+ supported), **pnpm 10.30.1**, and **curl 7.70+**. Select either a ready Mobilerun device or an ADB-connected local Android device. Jev requires a TypeSafe API key; Hosted Jev is the default decision provider for studio tasks. Tested locally on macOS; CI runs offline tests and the build on Linux.
 
 ```sh
 git clone https://github.com/droidrun/mobile-jev.git
@@ -22,7 +22,7 @@ pnpm install --frozen-lockfile
 cp .env.example .env.local
 ```
 
-The checked-in template selects local ADB mode with Rizzo. For this mode, set `ADB_SERIAL` to the exact authorized device serial and set `AGENT_DEVICE_IDENTITY` to a stable identity for that physical tablet. Start the device service and studio in separate terminals:
+The checked-in template selects local ADB mode with hosted Jev. For this mode, set `ADB_SERIAL` to the exact authorized device serial and set `AGENT_DEVICE_IDENTITY` to a stable identity for that physical tablet. Start the device service and studio in separate terminals:
 
 ```sh
 pnpm service
@@ -117,7 +117,7 @@ An identical prompt is not guaranteed to produce an identical trace. App version
 
 Rizzo uses hierarchical selection when a local choice has more than 24 candidates. Each request stays within 24 criteria, and later rounds select among earlier winners. This keeps request size bounded, but the resulting distribution is not calibrated across candidates eliminated in earlier rounds. Local provider identity is checked against the pinned Rizzo health model fingerprint, runtime metadata, the served model, or the pinned TEV-1 digest before use. The CLI and studio expose a `tev1` backend selector, but use TEV-1 only for saved model-packet replay; do not count replay as a live-device result.
 
-The device service has a foreground command, `pnpm service`, for local development. Persistent macOS service startup belongs to the host provisioning setup; this repository does not install or register a LaunchAgent. See [local setup and service details](docs/LOCAL-SETUP.md).
+The device service has a foreground command, `pnpm service`, for local development. Android service startup belongs to the tablet provisioning repository. The iOS supervisor and its per-device LaunchAgent installer are in this repository. See [local setup](docs/LOCAL-SETUP.md) and [iOS setup](docs/IOS-SETUP.md).
 
 ## Development
 

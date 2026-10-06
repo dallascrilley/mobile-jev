@@ -19,7 +19,8 @@ try {
 } catch {
   check('curl', false, 'Install curl 7.70 or newer.');
 }
-const local = process.env.MOBILE_DEVICE_BACKEND === 'local' || Boolean(process.env.ADB_SERIAL);
+const local =
+  ['local', 'ios'].includes(process.env.MOBILE_DEVICE_BACKEND) || Boolean(process.env.ADB_SERIAL);
 if (!local)
   check(
     'Mobilerun API key',

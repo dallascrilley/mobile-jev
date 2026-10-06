@@ -65,13 +65,19 @@ export function useStudio() {
   }, [loadDevice]);
 
   useEffect(() => {
-    if (!device || device.backend === 'local' || device.streamUrl || deviceError) return;
+    if (
+      !device ||
+      ['local', 'ios'].includes(device.backend || '') ||
+      device.streamUrl ||
+      deviceError
+    )
+      return;
     const timer = setTimeout(() => void loadDevice(), 3000);
     return () => clearTimeout(timer);
   }, [device, deviceError, loadDevice]);
 
   useEffect(() => {
-    if (device?.backend !== 'local' || busy) return;
+    if (!['local', 'ios'].includes(device?.backend || '') || busy) return;
     const timer = setInterval(() => setLocalFrame(Date.now()), 1500);
     return () => clearInterval(timer);
   }, [device?.backend, busy]);
@@ -137,7 +143,7 @@ export function useStudio() {
   };
 
   const manualAction = async (action: { type: 'global'; name: 'back' | 'home' | 'recent' }) => {
-    if (busy || device?.backend !== 'local') return;
+    if (busy || !['local', 'ios'].includes(device?.backend || '')) return;
     try {
       await sendObservedLocalAction(action);
       setLocalFrame(Date.now());

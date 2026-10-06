@@ -1,0 +1,1080 @@
+{
+  "date": "2026-10-06",
+  "status": "scored diagnostic; one trial per scenario/configuration",
+  "pins": {
+    "date": "2026-10-06",
+    "node": "26.8.2",
+    "models": {
+      "jev": "jev-1.13.0",
+      "rizzo": "rizzo-flow-4b-q8_0",
+      "tev1": "tev1:4b-q4_K_M",
+      "adb": "gpt-6.1-sol"
+    },
+    "simUse": "0.14.0",
+    "rizzo": {
+      "status": "ready",
+      "model": {
+        "source": "XHToken/Spark-X2.5-4B",
+        "requested_revision": "0bcb35678590218655dff3765b9e61c83b35e9c4",
+        "gguf_source": "rizzoaiacademy/rizzo-flow",
+        "gguf_revision": "55633c8cbd2b826bd3eefdeb05310450996649df",
+        "source_files": {
+          "rizzo-flow-4b-q8.gguf": "dbec3c89d33984772324e65a8ed56b48e958e301b856cb870a7c1b385d01691a"
+        },
+        "precision": "q8_0",
+        "device": "gpu",
+        "backend": "mtl",
+        "runtime": "llama.cpp",
+        "llama_cpp_release": "b11081",
+        "llama_cpp_commit": "161755f29e415e2c33efe906e91843c068efd664",
+        "prompt_version": "spark-decisions-v3",
+        "weights": "flow",
+        "fingerprint": "5310c906db493b1a2414d9ae25b9fd7f0d15fd28e5b593810ce17f4d87bf7ae8",
+        "device_name": "Apple M2 Pro",
+        "context_cells": 10240,
+        "load_seconds": 11.337140625000018
+      }
+    },
+    "tev1": {
+      "models": [
+        {
+          "name": "tev1:4b-q4_K_M",
+          "model": "tev1:4b-q4_K_M",
+          "modified_at": "2026-10-03T17:31:35.096982711-05:00",
+          "size": 2708817129,
+          "digest": "07be32e6e5e3dcc6b2deae7c68b89321e99daeedb08521e92771cc155473cbd9",
+          "details": {
+            "parent_model": "Tev1-4B-Q4_K_M.gguf",
+            "format": "gguf",
+            "family": "qwen35",
+            "families": ["qwen35"],
+            "parameter_size": "4.2B",
+            "quantization_level": "Q4_K_M",
+            "context_length": 262144,
+            "embedding_length": 2560
+          },
+          "capabilities": ["decision"]
+        }
+      ]
+    },
+    "revision": "395fc222beac4f059f9a0beb337d114a2b066e99",
+    "scenarioGoals": [
+      {
+        "id": "dark-theme",
+        "goal": "Turn on dark theme in Android Settings. Stop when Dark is selected."
+      },
+      {
+        "id": "timeout",
+        "goal": "Set the screen timeout to 5 minutes in Android Settings."
+      },
+      {
+        "id": "calculator",
+        "goal": "Calculate 137 + 248 in Calculator and leave the result visible."
+      },
+      {
+        "id": "form",
+        "goal": "In Chrome set Name \"Taylor Tablet\", Destination \"Austin\", Category \"Support\", Notes \"Inspect tablet readiness\". Scroll and select Review request. Stop at the review screen."
+      }
+    ],
+    "selectedConfigurations": ["mobile-jev", "mobile-rizzo", "sim-jev", "adb-agent"],
+    "repeatCount": 1,
+    "calculator": {
+      "package": "org.fossify.math",
+      "version": "1.4.0",
+      "apkSha256": "7c5443c22d6d62c67dfe80df33ea9161ff0fa440f92590bcb45d7008b57613ed"
+    },
+    "revisions": {
+      "sim": "c634f6fac1f7bb0b69ec186fe789eaffb2548160"
+    },
+    "freshContext": {
+      "newProcess": true,
+      "resume": false,
+      "history": "empty per trial",
+      "memory": false,
+      "skills": false,
+      "budget": {
+        "actions": 30,
+        "wallSeconds": 180
+      }
+    },
+    "scripts/mobile-agent/policy.mjs": "00daf81a4997c050fce55ba2e918b660ff24faef9c10d2b76bc84a9fcf63a722",
+    "scripts/mobile-agent/providers.mjs": "d11f0430ea4a56867cb57aea1b7cf78c4427fe5803432ab13a34983406de5e76",
+    "scripts/mobile-agent/local-device.mjs": "78afa2f56acb1a42de51e45be48376d4d04fee7a34a7121f72399de9f2916920",
+    "scripts/benchmark-mobile.mjs": "b8a6f54be2c01b6cff36c7acd6435e5e4739a21a38f7161776fca28b123e0f91",
+    "scripts/benchmark.mjs": "c66eeefaeb3d022c92e1547245d7c311fce5fe0dfdbbee2fb02afddeb3e14c2b",
+    "scripts/benchmark-fixture.mjs": "13d5ce14ee4c5b1b4adb4fbc3122c600992073c04e142e436a4192b7ad681e0a",
+    "scripts/mobile-agent/device.mjs": "53dfb0de45f3c003b37b7f421587c584fbf1dd69bd56f3901240f481d72229a6",
+    "scripts/mobile-agent/agent.mjs": "816e55bcdb3a1a4c9da6f7e414ab5afb71de6bf367375dacc28656bdd8a28362",
+    "scripts/mobile-agent/actions.mjs": "2de3e1fc7186e8659f0f751953dba034b022038fe03465b210821567a911f9bd",
+    "scripts/mobile-agent/text.mjs": "59607a4bbc44b69787202cc03791fbd62a220732fa6a2b990ff63b30ce844167",
+    "simFiles": {
+      "loop.py": "c1b6c885b1e5df564c8ef0b973d166777058b1ef489bf9b10b998fc9e0c69030",
+      "typesafe.py": "730b2f98af6d4537c5bbee0ce0ce3eb7110bbfcfe426b0e988f44640dc2ec352",
+      "providers.py": "36727370c9955979ada7643aeab58c8f2d6c18d54af4aed5271103c178fc85e4",
+      "candidates.py": "6a13dbfdb9ea9b1428653b006f34f5246d6d417fa11542bf754f9c0d396e00ed",
+      "sim_use.py": "17a8d557fe64c00e1519a92e01c494765edee63251b2b21a84c13380b683239d",
+      "device_lock.py": "d003db204f908766443533821fae525c0be405c36b6045c28f889e3dc2e9829c"
+    }
+  },
+  "trials": [
+    {
+      "id": "dark-theme-mobile-jev-1",
+      "scenario": "dark-theme",
+      "configuration": "mobile-jev",
+      "repetition": 1,
+      "actions": 1,
+      "wallMs": 6013,
+      "verified": true,
+      "declared": {
+        "at": 1791269834836,
+        "event": "result",
+        "status": "done",
+        "steps": 1,
+        "timings": {
+          "modelMs": 369.1,
+          "actionMs": 1273.8,
+          "observationMs": 2341.3,
+          "waitMs": 801.6,
+          "staleRetries": 0,
+          "modelCalls": 2,
+          "wallMs": 5935.4
+        }
+      },
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.settings",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": null,
+        "fingerprint": "ea3c6bf28fc1521c8d62b88c78ac829d1b1048b29f6c8298446d558093c98830"
+      },
+      "evidence": {
+        "night": "Night mode: yes"
+      },
+      "error": ""
+    },
+    {
+      "id": "dark-theme-mobile-rizzo-1",
+      "scenario": "dark-theme",
+      "configuration": "mobile-rizzo",
+      "repetition": 1,
+      "actions": 1,
+      "wallMs": 12761,
+      "verified": true,
+      "declared": {
+        "at": 1791269852309,
+        "event": "result",
+        "status": "done",
+        "steps": 1,
+        "timings": {
+          "modelMs": 7260.1,
+          "actionMs": 1205.3,
+          "observationMs": 2340.6,
+          "waitMs": 800.4,
+          "staleRetries": 0,
+          "modelCalls": 2,
+          "wallMs": 12683.3
+        }
+      },
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.settings",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": null,
+        "fingerprint": "ea3c6bf28fc1521c8d62b88c78ac829d1b1048b29f6c8298446d558093c98830"
+      },
+      "evidence": {
+        "night": "Night mode: yes"
+      },
+      "error": ""
+    },
+    {
+      "id": "dark-theme-sim-jev-1",
+      "scenario": "dark-theme",
+      "configuration": "sim-jev",
+      "repetition": 1,
+      "actions": 2,
+      "wallMs": 4783,
+      "verified": true,
+      "declared": "done",
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.settings",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": null,
+        "fingerprint": "ea3c6bf28fc1521c8d62b88c78ac829d1b1048b29f6c8298446d558093c98830"
+      },
+      "evidence": {
+        "night": "Night mode: yes"
+      },
+      "error": ""
+    },
+    {
+      "id": "dark-theme-adb-agent-1",
+      "scenario": "dark-theme",
+      "configuration": "adb-agent",
+      "repetition": 1,
+      "actions": 1,
+      "wallMs": 22697,
+      "verified": true,
+      "declared": "Dark theme is enabled. Verified Dark is selected in Android Settings.",
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.settings",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": null,
+        "fingerprint": "ea3c6bf28fc1521c8d62b88c78ac829d1b1048b29f6c8298446d558093c98830"
+      },
+      "evidence": {
+        "night": "Night mode: yes"
+      },
+      "error": ""
+    },
+    {
+      "id": "timeout-mobile-rizzo-1",
+      "scenario": "timeout",
+      "configuration": "mobile-rizzo",
+      "repetition": 1,
+      "actions": 0,
+      "wallMs": 7153,
+      "verified": false,
+      "declared": {
+        "at": 1791269900831,
+        "event": "result",
+        "status": "blocked",
+        "steps": 0,
+        "timings": {
+          "modelMs": 4712.9,
+          "actionMs": 0,
+          "observationMs": 1133.7,
+          "waitMs": 0,
+          "staleRetries": 0,
+          "modelCalls": 1,
+          "wallMs": 7084.7
+        }
+      },
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.settings",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": null,
+        "fingerprint": "ea3c6bf28fc1521c8d62b88c78ac829d1b1048b29f6c8298446d558093c98830"
+      },
+      "evidence": {
+        "timeout": "30000"
+      },
+      "error": ""
+    },
+    {
+      "id": "timeout-sim-jev-1",
+      "scenario": "timeout",
+      "configuration": "sim-jev",
+      "repetition": 1,
+      "actions": 1,
+      "wallMs": 5299,
+      "verified": false,
+      "declared": "error",
+      "process": {
+        "exit": 1,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.settings",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": null,
+        "fingerprint": "ea3c6bf28fc1521c8d62b88c78ac829d1b1048b29f6c8298446d558093c98830"
+      },
+      "evidence": {
+        "timeout": "30000"
+      },
+      "error": "Error: Stale alias '@20': semantic target changed"
+    },
+    {
+      "id": "timeout-adb-agent-1",
+      "scenario": "timeout",
+      "configuration": "adb-agent",
+      "repetition": 1,
+      "actions": 3,
+      "wallMs": 43953,
+      "verified": true,
+      "declared": "Screen timeout set to **5 minutes**, verified selected in Android Settings.",
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.settings",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": null,
+        "fingerprint": "ea3c6bf28fc1521c8d62b88c78ac829d1b1048b29f6c8298446d558093c98830"
+      },
+      "evidence": {
+        "timeout": "300000"
+      },
+      "error": ""
+    },
+    {
+      "id": "timeout-mobile-jev-1",
+      "scenario": "timeout",
+      "configuration": "mobile-jev",
+      "repetition": 1,
+      "actions": 3,
+      "wallMs": 15124,
+      "verified": true,
+      "declared": {
+        "at": 1791269980067,
+        "event": "result",
+        "status": "done",
+        "steps": 3,
+        "timings": {
+          "modelMs": 837.6,
+          "actionMs": 4300.1,
+          "observationMs": 5689.5,
+          "waitMs": 2473.7,
+          "staleRetries": 0,
+          "modelCalls": 4,
+          "wallMs": 14829.2
+        }
+      },
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.settings",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": null,
+        "fingerprint": "ea3c6bf28fc1521c8d62b88c78ac829d1b1048b29f6c8298446d558093c98830"
+      },
+      "evidence": {
+        "timeout": "300000"
+      },
+      "error": ""
+    },
+    {
+      "id": "calculator-sim-jev-1",
+      "scenario": "calculator",
+      "configuration": "sim-jev",
+      "repetition": 1,
+      "actions": 30,
+      "wallMs": 30522,
+      "verified": false,
+      "declared": "executed",
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "org.fossify.math",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": ["0"],
+        "fingerprint": "8c346322aedb943c2de2da30297646495461932ee061ee4a8615a80851a5380b"
+      },
+      "evidence": {
+        "foreground": "org.fossify.math",
+        "results": [
+          {
+            "id": "org.fossify.math:id/result",
+            "text": "11",
+            "label": ""
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "id": "calculator-adb-agent-1",
+      "scenario": "calculator",
+      "configuration": "adb-agent",
+      "repetition": 1,
+      "actions": 8,
+      "wallMs": 25841,
+      "verified": true,
+      "declared": "137 + 248 = **385**. Verified the result is visible in Calculator and left it on screen.",
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "org.fossify.math",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": ["0"],
+        "fingerprint": "8c346322aedb943c2de2da30297646495461932ee061ee4a8615a80851a5380b"
+      },
+      "evidence": {
+        "foreground": "org.fossify.math",
+        "results": [
+          {
+            "id": "org.fossify.math:id/result",
+            "text": "385",
+            "label": ""
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "id": "calculator-mobile-jev-1",
+      "scenario": "calculator",
+      "configuration": "mobile-jev",
+      "repetition": 1,
+      "actions": 30,
+      "wallMs": 107709,
+      "verified": false,
+      "declared": {
+        "at": 1791270174408,
+        "event": "result",
+        "status": "step_limit",
+        "steps": 30,
+        "timings": {
+          "modelMs": 4815,
+          "actionMs": 40887.5,
+          "observationMs": 36670.5,
+          "waitMs": 24071,
+          "staleRetries": 0,
+          "modelCalls": 31,
+          "wallMs": 107613
+        }
+      },
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "org.fossify.math",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": ["0"],
+        "fingerprint": "8c346322aedb943c2de2da30297646495461932ee061ee4a8615a80851a5380b"
+      },
+      "evidence": {
+        "foreground": "org.fossify.math",
+        "results": [
+          {
+            "id": "org.fossify.math:id/result",
+            "text": "111,111,111,111,111,111,111,111,111,111",
+            "label": ""
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "id": "calculator-mobile-rizzo-1",
+      "scenario": "calculator",
+      "configuration": "mobile-rizzo",
+      "repetition": 1,
+      "actions": 2,
+      "wallMs": 26166,
+      "verified": false,
+      "declared": {
+        "at": 1791270210420,
+        "event": "result",
+        "status": "stuck",
+        "steps": 2,
+        "timings": {
+          "modelMs": 16228.4,
+          "actionMs": 2408.9,
+          "observationMs": 4720.7,
+          "waitMs": 1666.9,
+          "staleRetries": 0,
+          "modelCalls": 3,
+          "wallMs": 26101.5
+        }
+      },
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "org.fossify.math",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": ["0"],
+        "fingerprint": "8c346322aedb943c2de2da30297646495461932ee061ee4a8615a80851a5380b"
+      },
+      "evidence": {
+        "foreground": "org.fossify.math",
+        "results": [
+          {
+            "id": "org.fossify.math:id/result",
+            "text": "0+",
+            "label": ""
+          }
+        ]
+      },
+      "error": ""
+    },
+    {
+      "id": "form-adb-agent-1",
+      "scenario": "form",
+      "configuration": "adb-agent",
+      "repetition": 1,
+      "actions": 17,
+      "wallMs": 90598,
+      "verified": true,
+      "declared": "Stopped at the review screen. All values visibly match:\n\n- Name: Taylor Tablet\n- Destination: Austin\n- Category: Support\n- Notes: Inspect tablet readiness\n\nThe screen confirms no message was sent.",
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.chrome",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": ["", ""],
+        "fingerprint": "21ee41980194c655753a17a9015f67140273a3e84609ffe542cd56f5b372b460"
+      },
+      "evidence": {
+        "receipt": {
+          "name": "Taylor Tablet",
+          "destination": "Austin",
+          "category": "Support",
+          "notes": "Inspect tablet readiness"
+        }
+      },
+      "error": ""
+    },
+    {
+      "id": "form-mobile-jev-1",
+      "scenario": "form",
+      "configuration": "mobile-jev",
+      "repetition": 1,
+      "actions": 4,
+      "wallMs": 20491,
+      "verified": false,
+      "declared": null,
+      "process": {
+        "exit": 1,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.chrome",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": ["", ""],
+        "fingerprint": "a56fd2712fa9d61d311d1e829d31e0e78d1db764ea038b20ac45bb0873ddc76d"
+      },
+      "evidence": {
+        "receipt": null
+      },
+      "error": ""
+    },
+    {
+      "id": "form-mobile-rizzo-1",
+      "scenario": "form",
+      "configuration": "mobile-rizzo",
+      "repetition": 1,
+      "actions": 1,
+      "wallMs": 121144,
+      "verified": false,
+      "declared": {
+        "at": 1791270455040,
+        "event": "result",
+        "status": "blocked",
+        "steps": 1,
+        "timings": {
+          "modelMs": 115462.5,
+          "actionMs": 1284.8,
+          "observationMs": 2369.4,
+          "waitMs": 802.3,
+          "staleRetries": 0,
+          "modelCalls": 2,
+          "wallMs": 121012.5
+        }
+      },
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.chrome",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": ["", ""],
+        "fingerprint": "90747cf65d3aaa4cf9321ff8081886227cde8fd950b53e1735c04b7abd1acafd"
+      },
+      "evidence": {
+        "receipt": null
+      },
+      "error": ""
+    },
+    {
+      "id": "form-sim-jev-1",
+      "scenario": "form",
+      "configuration": "sim-jev",
+      "repetition": 1,
+      "actions": 30,
+      "wallMs": 41738,
+      "verified": false,
+      "declared": "executed",
+      "process": {
+        "exit": 0,
+        "timedOut": false
+      },
+      "baseline": {
+        "night": "Night mode: no",
+        "timeout": "30000",
+        "foreground": "com.android.chrome",
+        "screen": {
+          "width": 2800,
+          "height": 1752
+        },
+        "fixtureEmpty": true,
+        "initialValues": ["", ""],
+        "fingerprint": "5dddab0efa86124e381df39cc2545297b43af37e2cae41dc3d97c2c96ae5b73b"
+      },
+      "evidence": {
+        "receipt": null
+      },
+      "error": ""
+    }
+  ],
+  "savedDecisionReplay": {
+    "kind": "saved-packet-replay",
+    "reports": [
+      {
+        "packet": 0,
+        "backend": "jev",
+        "model": "jev-1.13.0",
+        "latencyMs": 205.46266699999998,
+        "answers": {
+          "operation": {
+            "type": "choice",
+            "choice": "TAP",
+            "confidence": 0.96,
+            "probabilities": {
+              "SCROLL_LEFT": 0,
+              "HOME": 0,
+              "DONE": 0.03,
+              "SCROLL_RIGHT": 0,
+              "BLOCKED": 0,
+              "WAIT": 0,
+              "SCROLL_UP": 0,
+              "TAP": 0.97,
+              "SCROLL_DOWN": 0,
+              "BACK": 0
+            }
+          },
+          "tap_target": {
+            "type": "choice",
+            "choice": "2",
+            "confidence": 0.99,
+            "probabilities": {
+              "1": 0,
+              "2": 1,
+              "3": 0,
+              "4": 0,
+              "5": 0,
+              "6": 0,
+              "7": 0,
+              "8": 0,
+              "9": 0,
+              "10": 0
+            }
+          },
+          "scroll_target": {
+            "type": "choice",
+            "choice": "11",
+            "confidence": 1,
+            "probabilities": {
+              "11": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 1902,
+          "output_tokens": 209
+        },
+        "probabilitySource": "backend-reported"
+      },
+      {
+        "packet": 0,
+        "backend": "rizzo",
+        "model": "rizzo-flow-4b-q8_0",
+        "latencyMs": 3678.618458,
+        "answers": {
+          "operation": {
+            "type": "choice",
+            "choice": "TAP",
+            "probabilities": {
+              "TAP": 0.8704977897917282,
+              "SCROLL_DOWN": 0.032420575980142176,
+              "SCROLL_UP": 0.010286377634851926,
+              "SCROLL_LEFT": 0.009339728171147714,
+              "SCROLL_RIGHT": 0.005083593654894876,
+              "BACK": 0.0009989471210870501,
+              "HOME": 0.00023087648970626738,
+              "WAIT": 0.000977360946809257,
+              "DONE": 0.06957669247194846,
+              "BLOCKED": 0.0005880577376841951
+            },
+            "confidence": 0.8561086553241424
+          },
+          "tap_target": {
+            "type": "choice",
+            "choice": "2",
+            "probabilities": {
+              "1": 0.0018448198692302803,
+              "2": 0.9223356914825642,
+              "3": 0.07399137889474587,
+              "4": 0.0009580155017352502,
+              "5": 0.0002839880235850868,
+              "6": 0.00020016470247094856,
+              "7": 8.489987466320668e-5,
+              "8": 0.0001029817318458922,
+              "9": 8.134150923218685e-5,
+              "10": 0.00011671840992702238
+            },
+            "confidence": 0.9137063238695158
+          },
+          "scroll_target": {
+            "type": "choice",
+            "choice": "11",
+            "confidence": 1,
+            "probabilities": {
+              "11": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 1620,
+          "output_tokens": 0
+        },
+        "probabilitySource": "backend-reported"
+      },
+      {
+        "packet": 0,
+        "backend": "tev1",
+        "model": "tev1:4b-q4_K_M",
+        "latencyMs": 1227.6344159999999,
+        "answers": {
+          "operation": {
+            "type": "choice",
+            "choice": "SCROLL_DOWN",
+            "probabilities": {
+              "TAP": 0.03754459575913195,
+              "SCROLL_DOWN": 0.9436806598012561,
+              "SCROLL_UP": 0.017147781324415124,
+              "SCROLL_LEFT": 0.0001590986719561616,
+              "SCROLL_RIGHT": 0.0001511081276063859,
+              "BACK": 3.0330708965354464e-5,
+              "HOME": 1.032415020394837e-5,
+              "WAIT": 7.273794225339584e-5,
+              "DONE": 0.00116575546623138,
+              "BLOCKED": 3.76080479805142e-5
+            },
+            "confidence": 0.8871882379371874
+          },
+          "tap_target": {
+            "type": "choice",
+            "choice": "2",
+            "probabilities": {
+              "1": 0.04418777769314257,
+              "2": 0.9363447945553282,
+              "3": 0.018827702671349835,
+              "4": 0.0001485047323899494,
+              "5": 0.00012933556988710496,
+              "6": 1.7258479592207517e-5,
+              "7": 6.743683760579966e-6,
+              "8": 2.5682512353742626e-5,
+              "9": 0.0002947561610686689,
+              "10": 1.744394112688989e-5
+            },
+            "confidence": 0.8784813442585658
+          },
+          "scroll_target": {
+            "type": "choice",
+            "choice": "11",
+            "confidence": 1,
+            "probabilities": {
+              "11": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 2515,
+          "output_tokens": 3
+        },
+        "probabilitySource": "backend-reported"
+      },
+      {
+        "packet": 1,
+        "backend": "jev",
+        "model": "jev-1.13.0",
+        "latencyMs": 143.05662500000017,
+        "answers": {
+          "operation": {
+            "type": "choice",
+            "choice": "SCROLL_DOWN",
+            "confidence": 0.8,
+            "probabilities": {
+              "WAIT": 0,
+              "TAP": 0.04,
+              "SCROLL_DOWN": 0.83,
+              "SCROLL_RIGHT": 0,
+              "SCROLL_LEFT": 0,
+              "BACK": 0.07,
+              "SCROLL_UP": 0.03,
+              "HOME": 0,
+              "DONE": 0,
+              "BLOCKED": 0.03
+            }
+          },
+          "tap_target": {
+            "type": "choice",
+            "choice": "10",
+            "confidence": 0.54,
+            "probabilities": {
+              "1": 0.09,
+              "2": 0,
+              "3": 0.02,
+              "4": 0.13,
+              "5": 0.09,
+              "6": 0.02,
+              "7": 0.01,
+              "8": 0.01,
+              "9": 0.04,
+              "10": 0.59
+            }
+          },
+          "scroll_target": {
+            "type": "choice",
+            "choice": "11",
+            "confidence": 1,
+            "probabilities": {
+              "11": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 1894,
+          "output_tokens": 211
+        },
+        "probabilitySource": "backend-reported"
+      },
+      {
+        "packet": 1,
+        "backend": "rizzo",
+        "model": "rizzo-flow-4b-q8_0",
+        "latencyMs": 4123.355167000001,
+        "answers": {
+          "operation": {
+            "type": "choice",
+            "choice": "BLOCKED",
+            "probabilities": {
+              "TAP": 0.07647700154235136,
+              "SCROLL_DOWN": 0.1423601196212423,
+              "SCROLL_UP": 0.0020823485591309632,
+              "SCROLL_LEFT": 0.002408848098634321,
+              "SCROLL_RIGHT": 0.0010420335260526903,
+              "BACK": 0.0023362435136273776,
+              "HOME": 0.0003687789247807016,
+              "WAIT": 0.002098830736001906,
+              "DONE": 0.008826507000094767,
+              "BLOCKED": 0.7619992884780837
+            },
+            "confidence": 0.7355547649756485
+          },
+          "tap_target": {
+            "type": "choice",
+            "choice": "10",
+            "probabilities": {
+              "1": 0.031455678862882835,
+              "2": 0.007921418457798443,
+              "3": 0.007843685543434903,
+              "4": 0.0036941148943424526,
+              "5": 0.027300981644347515,
+              "6": 0.005890486202223344,
+              "7": 0.0019954480291389507,
+              "8": 0.05221118478617156,
+              "9": 0.045131375342850784,
+              "10": 0.8165556262368092
+            },
+            "confidence": 0.7961729180408992
+          },
+          "scroll_target": {
+            "type": "choice",
+            "choice": "11",
+            "confidence": 1,
+            "probabilities": {
+              "11": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 1614,
+          "output_tokens": 0
+        },
+        "probabilitySource": "backend-reported"
+      },
+      {
+        "packet": 1,
+        "backend": "tev1",
+        "model": "tev1:4b-q4_K_M",
+        "latencyMs": 809.9142500000016,
+        "answers": {
+          "operation": {
+            "type": "choice",
+            "choice": "SCROLL_DOWN",
+            "probabilities": {
+              "TAP": 0.03822745888278249,
+              "SCROLL_DOWN": 0.600336843481716,
+              "SCROLL_UP": 0.15769587464568738,
+              "SCROLL_LEFT": 0.0012992495172654693,
+              "SCROLL_RIGHT": 0.008317500720746942,
+              "BACK": 0.0038654304929903872,
+              "HOME": 0.00011585552041983815,
+              "WAIT": 0.1141261112852522,
+              "DONE": 0.014270505922189047,
+              "BLOCKED": 0.061745169530950404
+            },
+            "confidence": 0.4468482228639342
+          },
+          "tap_target": {
+            "type": "choice",
+            "choice": "2",
+            "probabilities": {
+              "1": 0.05274495059761789,
+              "2": 0.5370552518552232,
+              "3": 0.17174355540775074,
+              "4": 0.0018842179421930275,
+              "5": 0.016572510570109337,
+              "6": 0.004605075617301215,
+              "7": 0.00020447131054625087,
+              "8": 0.14432935409083533,
+              "9": 0.014904204333720677,
+              "10": 0.05595640827470229
+            },
+            "confidence": 0.3914226140034682
+          },
+          "scroll_target": {
+            "type": "choice",
+            "choice": "11",
+            "confidence": 1,
+            "probabilities": {
+              "11": 1
+            }
+          }
+        },
+        "usage": {
+          "input_tokens": 2503,
+          "output_tokens": 3
+        },
+        "probabilitySource": "backend-reported"
+      }
+    ]
+  },
+  "postScoringFix": "Portal Android16 insert discards URI; exact readable field verification implemented after scored runs; scored failures retained.",
+  "effectiveAdbInstructions": "Control only the Android tablet with raw adb. Goal: Turn on dark theme in Android Settings. Stop when Dark is selected.\nUse adb -s <pinned-adb-transport> shell uiautomator dump and adb -s <pinned-adb-transport> shell cat for observations; input tap/swipe/text/keyevent for actions. You may inspect foreground or settings read-only. Do not use settings writes, cmd uimode writes, browser/CDP APIs, prewritten scripts, other agents, memory, saved traces, or network. Use fresh UI observations, not guessed taps. Execute at most 30 individual device input actions within 180 seconds. Do not combine input actions in a shell command. Stop when all goal requirements visibly hold or blocked. You start with no prior history. Do not open other files beyond your own UI dump. Keep screenshots local. Do not enter credentials or submit external communications. Return concise outcome.",
+  "adbToolset": ["exec_command", "write_stdin"],
+  "postScoringProof": {
+    "textReplacement": "verified exact field readback, Unicode and punctuation",
+    "clear": "verified exact field readback",
+    "transportRecovery": "HTTP200 recovered",
+    "noReplay": "used observation HTTP409",
+    "contention": "observe while goal runs HTTP409",
+    "cancel": "stopping then stopped",
+    "screenshots": "PNG200",
+    "apps": 121
+  }
+}

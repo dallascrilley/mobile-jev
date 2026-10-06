@@ -21,11 +21,11 @@ The reset is also a Jev goal. It has no prepared tap sequence and must independe
 
 The timer starts before readiness, UI observation, and installed-app discovery. It includes model calls, state reads, device actions, transition waits, stale retries, and trace writes, ending at the accepted model outcome. A separate fresh observation verifies the switch. Reports contain execution time, verification time, and their combined total. Reset time is reported separately; after reset, the model connection may already be warm and Settings may already be on the relevant screen. Do not compare that timing with a cold start from another app without stating the difference.
 
-All requests use the Mobilerun API, with Jev at TypeSafe selecting the operations and targets. There is no ADB shortcut. `OPEN_APP` uses the installed-app registry and the public app-start endpoint; it is recorded as a selected action, not hidden setup.
+The exploratory measurements below used the Mobilerun API, with Jev at TypeSafe selecting the operations and targets. The packaged runner uses the configured device transport, so local mode can use ADB and the Mobilerun Portal adapter. `OPEN_APP` uses the installed-app registry and the selected adapter's app-start operation; it is recorded as a selected action, not hidden setup. See [local setup](./LOCAL-SETUP.md) for transport and credential requirements.
 
 ## Development observations
 
-One exploratory dark-theme run took **8.685 seconds**, including three executed actions, five Jev calls, and one stale decision rejected before execution. The recorded final Settings observation contained `Dark theme`, `checkable: true`, and `checked: true`. That trial predates the packaged demo runner's additional fresh verification request and does not establish a repeatability or speed guarantee. No multi-run success rate is claimed.
+One exploratory Mobilerun dark-theme run took **8.685 seconds**, including three executed actions, five Jev calls, and one stale decision rejected before execution. The recorded final Settings observation contained `Dark theme`, `checkable: true`, and `checked: true`. That trial predates the packaged demo runner's additional fresh verification request and does not establish a repeatability or speed guarantee. No multi-run success rate is claimed. Current TEV-1 comparisons use saved model-packet replay and are not live-device trials.
 
 Earlier exploration showed why independent verification is necessary:
 

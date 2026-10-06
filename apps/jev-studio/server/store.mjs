@@ -27,11 +27,13 @@ export function checkRequest(request) {
 export function createStore({
   spawnTask = spawn,
   now = Date.now,
+  taskTimeoutMs = 180_000,
   runner = resolve(process.cwd(), '../../scripts/mobile-agent/web-runner.mjs'),
 } = {}) {
   const runs = new Map(),
     listeners = new Map(),
-    processes = new Map();
+    processes = new Map(),
+    timers = new Map();
   const snapshot = (id) => (runs.get(id) ? structuredClone(runs.get(id)) : null);
   const publish = (id) => {
     for (const callback of listeners.get(id) || []) {
@@ -61,11 +63,13 @@ export function createStore({
         listeners.get(id)?.delete(callback);
       };
     },
-    start({ goal, maxSteps = 30 }) {
+    start({ goal, maxSteps = 30, backend = 'jev' }) {
       if (typeof goal !== 'string' || !goal.trim() || goal.length > 4000)
         throw new StudioError('Enter a goal between 1 and 4,000 characters.');
-      if (!Number.isInteger(maxSteps) || maxSteps < 1 || maxSteps > 50)
-        throw new StudioError('The step limit must be between 1 and 50.');
+      if (!Number.isInteger(maxSteps) || maxSteps < 1 || maxSteps > 30)
+        throw new StudioError('The step limit must be between 1 and 30.');
+      if (!['jev', 'rizzo', 'tev1'].includes(backend))
+        throw new StudioError('Choose Jev, Rizzo, or TEV-1 as the decision backend.');
       if (active()) throw new StudioError('A task is already running on this device.', 409);
       while (runs.size >= 30) {
         const id = runs.keys().next().value;
@@ -77,6 +81,7 @@ export function createStore({
         id,
         goal: goal.trim(),
         maxSteps,
+        backend,
         status: 'running',
         startedAt: now(),
         endedAt: null,
@@ -91,13 +96,21 @@ export function createStore({
         run.endedAt = now();
         if (message) run.error = message;
         processes.delete(id);
+        clearTimeout(timers.get(id));
+        timers.delete(id);
         publish(id);
       };
       let child;
       try {
+        const taskEnv = { ...process.env };
+        if (taskEnv.MOBILE_DEVICE_BACKEND === 'local') {
+          delete taskEnv.MOBILERUN_API_KEY;
+          delete taskEnv.MOBILERUN_CLOUD_API_KEY;
+        }
+        if (backend !== 'jev') delete taskEnv.TYPESAFE_API_KEY;
         child = spawnTask(process.execPath, [runner], {
           stdio: ['pipe', 'pipe', 'pipe'],
-          env: process.env,
+          env: taskEnv,
           detached: process.platform !== 'win32',
         });
       } catch {
@@ -105,6 +118,27 @@ export function createStore({
         return snapshot(id);
       }
       processes.set(id, child);
+      const kill = (signal) => {
+        try {
+          if (process.platform !== 'win32' && child.pid) process.kill(-child.pid, signal);
+          else child.kill(signal);
+        } catch {
+          /* Process already exited. */
+        }
+      };
+      const timeout = setTimeout(() => {
+        if (!processes.has(id)) return;
+        run.status = 'stopping';
+        run.error = 'Task exceeded the 180-second time limit.';
+        publish(id);
+        kill('SIGTERM');
+        const escalation = setTimeout(() => {
+          if (processes.has(id)) kill('SIGKILL');
+        }, 3000);
+        escalation.unref();
+      }, taskTimeoutMs);
+      timeout.unref();
+      timers.set(id, timeout);
       let buffer = '',
         outcome;
       child.stdin.on('error', () => {});
@@ -112,8 +146,15 @@ export function createStore({
       child.stdout.on('data', (chunk) => {
         buffer += chunk.toString();
         if (buffer.length > 1_000_000) {
-          child.kill('SIGTERM');
-          finish('failed', 'Task output exceeded its limit.');
+          if (run.status === 'stopping') return;
+          run.status = 'stopping';
+          run.error = 'Task output exceeded its limit.';
+          publish(id);
+          kill('SIGTERM');
+          const escalation = setTimeout(() => {
+            if (processes.has(id)) kill('SIGKILL');
+          }, 3000);
+          escalation.unref();
           return;
         }
         let index;
@@ -138,12 +179,13 @@ export function createStore({
       });
       child.once('error', () => finish('failed', 'Unable to start the task process.'));
       child.once('close', (code) => {
-        if (run.status === 'stopping') finish('stopped');
+        if (run.error) finish('failed', run.error);
+        else if (run.status === 'stopping') finish('stopped');
         else if (code !== 0 || run.error || !outcome)
           finish('failed', run.error || 'The task process ended unexpectedly.');
         else finish(outcome === 'done' ? 'succeeded' : 'blocked');
       });
-      child.stdin.end(JSON.stringify({ goal: run.goal, maxSteps }));
+      child.stdin.end(JSON.stringify({ goal: run.goal, maxSteps, backend }));
       return snapshot(id);
     },
     stop(id) {

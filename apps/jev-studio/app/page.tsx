@@ -28,6 +28,8 @@ export default function Studio() {
     setGoal,
     maxSteps,
     setMaxSteps,
+    backend,
+    setBackend,
     stop,
     run,
     submitting,
@@ -101,6 +103,22 @@ export default function Studio() {
                   }}
                 />
                 <div className="composer-footer">
+                  <label className="backend-select">
+                    <span>Decision model</span>
+                    <select
+                      aria-label="Decision model"
+                      value={backend}
+                      disabled={busy}
+                      onChange={(event) =>
+                        setBackend(event.target.value as 'jev' | 'rizzo' | 'tev1')
+                      }
+                    >
+                      <option value="jev">Jev</option>
+                      <option value="rizzo">Rizzo</option>
+                      <option value="tev1">TEV-1</option>
+                    </select>
+                    <ChevronDown size={12} />
+                  </label>
                   <label className="step-select">
                     <span>Step limit</span>
                     <select
@@ -112,7 +130,6 @@ export default function Studio() {
                       <option value={10}>10 steps</option>
                       <option value={20}>20 steps</option>
                       <option value={30}>30 steps</option>
-                      <option value={50}>50 steps</option>
                     </select>
                     <ChevronDown size={12} />
                   </label>

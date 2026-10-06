@@ -7,8 +7,19 @@ const DeviceStream = dynamic(
   { ssr: false },
 );
 export function DevicePanel({ state }: { state: StudioState }) {
-  const { connected, device, phoneStage, deviceError, controls, busy, loadDevice, setConnected } =
-    state;
+  const {
+    connected,
+    device,
+    phoneStage,
+    deviceError,
+    controls,
+    busy,
+    loadDevice,
+    setConnected,
+    localFrame,
+    manualAction,
+  } = state;
+  const local = device?.backend === 'local';
   return (
     <section className="device-column">
       <div className="device-heading">
@@ -50,6 +61,14 @@ export function DevicePanel({ state }: { state: StudioState }) {
                   Reconnect
                 </button>
               </div>
+            ) : local ? (
+              <img
+                className="local-device-image"
+                src={`/api/studio/local/screenshot?frame=${localFrame}`}
+                alt="Current local Android device screen"
+                onLoad={() => setConnected(true)}
+                onError={() => setConnected(false)}
+              />
             ) : (
               <DeviceStream
                 ref={controls}
@@ -69,7 +88,11 @@ export function DevicePanel({ state }: { state: StudioState }) {
             aria-label="Android back"
             title="Back"
             disabled={!connected || busy}
-            onClick={() => controls.current?.sendSystemKey('BACK')}
+            onClick={() =>
+              local
+                ? void manualAction({ type: 'global', name: 'back' })
+                : controls.current?.sendSystemKey('BACK')
+            }
           >
             <ArrowLeft size={17} />
           </button>
@@ -77,7 +100,11 @@ export function DevicePanel({ state }: { state: StudioState }) {
             aria-label="Android home"
             title="Home"
             disabled={!connected || busy}
-            onClick={() => controls.current?.sendSystemKey('HOME')}
+            onClick={() =>
+              local
+                ? void manualAction({ type: 'global', name: 'home' })
+                : controls.current?.sendSystemKey('HOME')
+            }
           >
             <Circle size={15} />
           </button>
@@ -85,7 +112,11 @@ export function DevicePanel({ state }: { state: StudioState }) {
             aria-label="Android recent apps"
             title="Recent apps"
             disabled={!connected || busy}
-            onClick={() => controls.current?.sendSystemKey('RECENT')}
+            onClick={() =>
+              local
+                ? void manualAction({ type: 'global', name: 'recent' })
+                : controls.current?.sendSystemKey('RECENT')
+            }
           >
             <Square size={13} />
           </button>
@@ -97,7 +128,7 @@ export function DevicePanel({ state }: { state: StudioState }) {
         <div className="stage-caption">
           <i />
           {busy ? 'Agent in control' : 'Touch & keyboard enabled'}
-          <span>ANDROID · MOBILERUN</span>
+          <span>ANDROID · {local ? 'LOCAL ADB' : 'MOBILERUN'}</span>
         </div>
       </div>
     </section>

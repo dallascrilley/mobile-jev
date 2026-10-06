@@ -21,7 +21,9 @@
     "lint": "eslint .",
     "format": "prettier . --check",
     "format:fix": "prettier . --write",
-    "check": "pnpm test && pnpm lint && pnpm typecheck && pnpm format && pnpm build"
+    "check": "pnpm test && pnpm lint && pnpm typecheck && pnpm format && pnpm build",
+    "service": "node scripts/device-service.mjs",
+    "benchmark": "node scripts/benchmark.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.4",

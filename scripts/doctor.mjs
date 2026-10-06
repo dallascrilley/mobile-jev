@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { loadEnvironment } from './env.mjs';
-import { MobilerunDevice } from './mobile-agent/device.mjs';
+import { createDevice } from './mobile-agent/device-factory.mjs';
 
 loadEnvironment();
 const checks = [];
@@ -19,41 +19,30 @@ try {
 } catch {
   check('curl', false, 'Install curl 7.70 or newer.');
 }
+const local = process.env.MOBILE_DEVICE_BACKEND === 'local' || Boolean(process.env.ADB_SERIAL);
+if (!local)
+  check(
+    'Mobilerun API key',
+    Boolean(process.env.MOBILERUN_API_KEY || process.env.MOBILERUN_CLOUD_API_KEY),
+    'Required only for cloud mode.',
+  );
 check(
-  'Mobilerun API key',
-  Boolean(process.env.MOBILERUN_API_KEY || process.env.MOBILERUN_CLOUD_API_KEY),
-  'Set MOBILERUN_API_KEY in .env.local.',
+  'Decision provider',
+  process.env.DECISION_BACKEND !== 'jev' || Boolean(process.env.TYPESAFE_API_KEY),
+  'Local providers do not need a hosted key.',
 );
-check(
-  'TypeSafe API key',
-  Boolean(process.env.TYPESAFE_API_KEY),
-  'Presence checked; no paid inference is made by doctor.',
-);
-check(
-  'Device ID',
-  Boolean(process.env.MOBILERUN_DEVICE_ID),
-  'Run pnpm devices, then set MOBILERUN_DEVICE_ID.',
-);
-if (checks.find((c) => c.name === 'Mobilerun API key')?.ok && process.env.MOBILERUN_DEVICE_ID) {
-  try {
-    const device = new MobilerunDevice();
-    const info = await device.assertReady();
-    const capabilities = await device.api(device.path('/capabilities'));
-    check('Device connection', true, `${info.name || info.id}: ${info.state}`);
-    check(
-      'Accessibility',
-      capabilities.capabilities?.accessibility === true,
-      'A readable accessibility tree is required.',
-    );
-    const observation = await device.observe();
-    check(
-      'UI observation',
-      true,
-      `${observation.elements.length} elements, ${observation.screen.width}×${observation.screen.height}`,
-    );
-  } catch (error) {
-    check('Device connection', false, error.message);
-  }
+try {
+  const device = createDevice();
+  const info = await device.assertReady();
+  check('Device connection', true, `${info.name || info.id}: ${info.state}`);
+  const observation = await device.observe();
+  check(
+    'UI observation',
+    observation.elements.length > 0,
+    `${observation.elements.length} elements, ${observation.screen.width}×${observation.screen.height}`,
+  );
+} catch (error) {
+  check('Device connection', false, error.message);
 }
 for (const item of checks)
   console.log(`${item.ok ? 'PASS' : 'FAIL'}  ${item.name}: ${item.detail}`);

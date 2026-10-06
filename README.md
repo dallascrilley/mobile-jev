@@ -6,13 +6,13 @@
 
 **One goal. A real Android phone. Jev makes the decisions.**
 
-A standalone mobile agent for [Mobilerun](https://mobilerun.ai), powered by [TypeSafe's Jev](https://docs.typesafe.ai/) and the [Mobilerun API](https://docs.mobilerun.ai/). Includes a live React studio, a CLI, execution traces, and request-level latency measurements. No ADB connection is required.
+A standalone mobile agent for [Mobilerun](https://mobilerun.ai) or a local Android device, powered by [TypeSafe's Jev](https://docs.typesafe.ai/) and selectable decision providers. It includes a live React studio, a CLI, execution traces, and request-level latency measurements. Cloud mode uses Mobilerun; local mode uses ADB and the device's Mobilerun Portal app.
 
-[Mobilerun](https://mobilerun.ai) · [Mobilerun docs](https://docs.mobilerun.ai) · [TypeSafe](https://typesafe.ai) · [Jev docs](https://docs.typesafe.ai) · [Demo guide](docs/DEMO.md)
+[Mobilerun](https://mobilerun.ai) · [Mobilerun docs](https://docs.mobilerun.ai) · [TypeSafe](https://typesafe.ai) · [Jev docs](https://docs.typesafe.ai) · [Local setup and service](docs/LOCAL-SETUP.md) · [Demo guide](docs/DEMO.md)
 
 ## Run it
 
-Requirements: **Node.js 24 recommended** (22.16+ supported), **pnpm 10.30.1**, **curl 7.70+**, a ready Mobilerun Android device, and API keys for Mobilerun and TypeSafe. Tested locally on macOS; CI runs offline tests and the build on Linux.
+Requirements: **Node.js 24 recommended** (22.16+ supported), **pnpm 10.30.1**, and **curl 7.70+**. Select either a ready Mobilerun device or an ADB-connected local Android device. Jev requires a TypeSafe API key; Rizzo is the default decision provider for studio tasks. Tested locally on macOS; CI runs offline tests and the build on Linux.
 
 ```sh
 git clone https://github.com/droidrun/mobile-jev.git
@@ -22,20 +22,22 @@ pnpm install --frozen-lockfile
 cp .env.example .env.local
 ```
 
-Add `MOBILERUN_API_KEY` and `TYPESAFE_API_KEY` to `.env.local`. List your devices, then set `MOBILERUN_DEVICE_ID` to the one you want to control:
+The checked-in template selects local ADB mode with Rizzo. For this mode, set `ADB_SERIAL` to the exact authorized device serial and set `AGENT_DEVICE_IDENTITY` to a stable identity for that physical tablet. Start the device service and studio in separate terminals:
 
 ```sh
-pnpm devices
-pnpm doctor
+pnpm service
+```
+
+```sh
 pnpm dev
 ```
 
-Open **http://127.0.0.1:3040**. Enter a goal and press **Run task**.
+Open **http://127.0.0.1:3040**. The studio connects to the service at **http://127.0.0.1:3041** by default. The service accepts loopback requests only. See [local setup and service details](docs/LOCAL-SETUP.md) for ADB readiness, environment options, and cloud mode.
 
-- Get a Mobilerun key from [API keys](https://cloud.mobilerun.ai/api-keys).
-- Get a TypeSafe key from the [TypeSafe console](https://console.typesafe.ai/).
-- Connect or provision your own Android device through Mobilerun. Device/service charges are separate from this project.
-- The default API endpoint is production. Set `MOBILERUN_BASE_URL` to your own environment if needed; the code contains no fixed account or device ID.
+- Local mode does not need Mobilerun or TypeSafe credentials when using Rizzo. The ADB host must be authorized and the device must have the Mobilerun Portal app available for UI observation.
+- To use cloud mode, set `MOBILE_DEVICE_BACKEND=mobilerun`, add `MOBILERUN_API_KEY` and `MOBILERUN_DEVICE_ID`, then run `pnpm dev`; the separate device service is not needed for the cloud studio.
+- Get a Mobilerun key from [API keys](https://cloud.mobilerun.ai/api-keys), and a TypeSafe key from the [TypeSafe console](https://console.typesafe.ai/). Set `TYPESAFE_API_KEY` only when selecting Jev.
+- Device and service charges may apply in cloud mode. The default cloud API endpoint is production; set `MOBILERUN_BASE_URL` for another supported environment.
 
 Already export your variables? That works too. Exported variables take precedence over `.env.local`, which takes precedence over `.env`.
 
@@ -55,8 +57,11 @@ pnpm demo dark-theme --reset
 - Goal input, executed-action timeline, model latency, and a task clock that stops on completion, failure, or cancellation.
 - Stop control, reconnect, fullscreen, and recent runs. Clear removes finished runs and resets the timer. One task owns the configured device at a time.
 - The desktop workspace fits in one viewport; activity scrolls inside its panel.
+- Select Jev, Rizzo, or TEV-1 as the decision backend for a task. The current default is Rizzo. Use TEV-1 only for saved model-packet replay; it is not used for live-device trials.
+- Local mode displays refreshed device screenshots and provides Back, Home, and Recent Apps buttons. It does not provide direct touch or keyboard streaming. Cloud mode uses the Mobilerun stream controls.
+- “Succeeded” means the selected policy returned `DONE` and the worker exited successfully. It is a model-declared outcome, not an independent check of the requested device state. Verify the resulting screen or use a task-specific verifier before claiming the goal is confirmed.
 
-The account API keys stay on the server. The browser receives device-scoped streaming credentials only. The app binds to localhost, validates request origins, and is intended for a single local operator. Public/multi-user hosting requires your own authentication and device authorization. Recent runs are held in memory and cleared on server restart.
+Account and decision-provider API keys stay in server-side environment variables loaded from `.env.local` or `.env`; do not use `NEXT_PUBLIC_` names or put keys in browser code. In local device mode the task worker does not inherit Mobilerun credentials. For Rizzo and TEV-1 workers, the TypeSafe key is also removed. In cloud mode the browser can receive device-scoped stream credentials from Mobilerun; it does not receive the account API key. The studio binds to localhost, validates request origins, and is intended for a single local operator. Public or multi-user hosting requires your own authentication and device authorization. Recent runs are held in memory and cleared on server restart.
 
 ## Use the CLI
 
@@ -109,6 +114,10 @@ The model transport reuses its HTTPS connection. Device readiness is cached brie
 Request timings split DNS, TCP/TLS, response wait, and download from total wall time. Response wait includes network, server, and device work—not just server processing. A 300 ms swipe also includes its requested gesture duration. See [the demo guide](docs/DEMO.md) for measurement boundaries, successes, and failures.
 
 An identical prompt is not guaranteed to produce an identical trace. App version, locale, current screen, account state, network, and model version affect results. `jev-latest` is convenient; set `TYPESAFE_MODEL` to a supported fixed version when comparing runs, and retain the returned model name in the trace.
+
+Rizzo uses hierarchical selection when a local choice has more than 24 candidates. Each request stays within 24 criteria, and later rounds select among earlier winners. This keeps request size bounded, but the resulting distribution is not calibrated across candidates eliminated in earlier rounds. Local provider identity is checked against the pinned Rizzo health model fingerprint, runtime metadata, the served model, or the pinned TEV-1 digest before use. The CLI and studio expose a `tev1` backend selector, but use TEV-1 only for saved model-packet replay; do not count replay as a live-device result.
+
+The device service has a foreground command, `pnpm service`, for local development. Persistent macOS service startup belongs to the host provisioning setup; this repository does not install or register a LaunchAgent. See [local setup and service details](docs/LOCAL-SETUP.md).
 
 ## Development
 

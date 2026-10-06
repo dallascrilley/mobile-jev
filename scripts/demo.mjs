@@ -3,9 +3,11 @@ import { mkdir, open, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { randomUUID } from 'node:crypto';
 import { loadEnvironment } from './env.mjs';
-import { MobilerunDevice } from './mobile-agent/device.mjs';
+import { createDevice } from './mobile-agent/device-factory.mjs';
+import { acquireDeviceLock } from './mobile-agent/device-lock.mjs';
+import { decisionRequest } from './mobile-agent/providers.mjs';
 import { TypeSafePolicy, runAgent } from './mobile-agent/agent.mjs';
-import { pooledRequest, decodeJson } from './mobile-agent/http.mjs';
+import { decodeJson } from './mobile-agent/http.mjs';
 import { measuredRequest, summarizeMetrics } from './mobile-agent/metrics.mjs';
 import { darkThemeState } from './demo-verifiers.mjs';
 
@@ -47,7 +49,7 @@ async function main() {
     };
     const metrics = [],
       decisions = [];
-    const device = new MobilerunDevice({
+    const device = createDevice({
       request: measuredRequest({
         service: 'mobilerun',
         metrics,
@@ -57,7 +59,7 @@ async function main() {
     const modelRequest = measuredRequest({
       service: 'typesafe',
       metrics,
-      request: pooledRequest,
+      request: decisionRequest,
       onMetric: (metric) => record({ event: 'request_timing', ...metric }),
     });
     const policy = new TypeSafePolicy({
@@ -68,6 +70,7 @@ async function main() {
         return bytes;
       },
     });
+    const release = await acquireDeviceLock(device.deviceId);
     const execute = (goal, phase) =>
       runAgent({
         device,
@@ -144,6 +147,7 @@ async function main() {
       console.error(JSON.stringify(report));
     } finally {
       await file.close();
+      await release();
     }
   }
   const path = resolve(directory, `summary-${Date.now()}.json`);

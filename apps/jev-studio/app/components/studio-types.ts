@@ -7,6 +7,7 @@ export type Device = {
   streamUrl: string | null;
   streamToken: string | null;
   environment: string;
+  backend?: 'local' | 'cloud';
 };
 export type Event = {
   type: 'decision' | 'action' | 'result' | 'error';
@@ -38,7 +39,7 @@ export const isActive = (run: Run | null) =>
 export const statusLabels: Record<string, string> = {
   running: 'In progress',
   stopping: 'Stopping',
-  succeeded: 'Completed',
+  succeeded: 'Model reports completion',
   stopped: 'Stopped',
   blocked: 'Needs attention',
   failed: 'Run failed',

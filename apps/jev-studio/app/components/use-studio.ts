@@ -2,12 +2,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { RemoteControlHandle } from '@mobilerun/react';
 import { type Device, type Run, isActive, clock } from './studio-types';
+import { sendObservedLocalAction } from './local-device.mjs';
 export function useStudio() {
   const [device, setDevice] = useState<Device | null>(null);
   const [deviceError, setDeviceError] = useState('');
   const [connected, setConnected] = useState(false);
   const [goal, setGoal] = useState('');
   const [maxSteps, setMaxSteps] = useState(30);
+  const [backend, setBackend] = useState<'jev' | 'rizzo' | 'tev1'>('jev');
+  const [localFrame, setLocalFrame] = useState(0);
   const [run, setRun] = useState<Run | null>(null);
   const [runs, setRuns] = useState<Run[]>([]);
   const [submitting, setSubmitting] = useState(false);
@@ -62,10 +65,16 @@ export function useStudio() {
   }, [loadDevice]);
 
   useEffect(() => {
-    if (!device || device.streamUrl || deviceError) return;
+    if (!device || device.backend === 'local' || device.streamUrl || deviceError) return;
     const timer = setTimeout(() => void loadDevice(), 3000);
     return () => clearTimeout(timer);
   }, [device, deviceError, loadDevice]);
+
+  useEffect(() => {
+    if (device?.backend !== 'local' || busy) return;
+    const timer = setInterval(() => setLocalFrame(Date.now()), 1500);
+    return () => clearInterval(timer);
+  }, [device?.backend, busy]);
 
   const runId = run?.id;
   useEffect(() => {
@@ -96,7 +105,10 @@ export function useStudio() {
         decisions.reduce((total, event) => total + (event.latencyMs || 0), 0) / decisions.length,
       )
     : null;
-  const model = latest?.model || 'jev-latest';
+  const model =
+    latest?.model ||
+    ({ jev: 'jev-1.13.0', rizzo: 'rizzo-flow-4b-q8_0', tev1: 'tev1:4b-q4_K_M' }[backend] ??
+      'jev-1.13.0');
 
   useEffect(() => {
     if (feed.current) feed.current.scrollTop = feed.current.scrollHeight;
@@ -111,7 +123,7 @@ export function useStudio() {
       const response = await fetch('/api/studio/runs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ goal, maxSteps }),
+        body: JSON.stringify({ goal, maxSteps, backend }),
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
@@ -121,6 +133,16 @@ export function useStudio() {
       setError(failure instanceof Error ? failure.message : 'Unable to start the task.');
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const manualAction = async (action: { type: 'global'; name: 'back' | 'home' | 'recent' }) => {
+    if (busy || device?.backend !== 'local') return;
+    try {
+      await sendObservedLocalAction(action);
+      setLocalFrame(Date.now());
+    } catch (failure) {
+      setError(failure instanceof Error ? failure.message : 'Could not control the local device.');
     }
   };
 
@@ -166,6 +188,10 @@ export function useStudio() {
     setGoal,
     maxSteps,
     setMaxSteps,
+    backend,
+    setBackend,
+    localFrame,
+    manualAction,
     run,
     setRun,
     runs,

@@ -171,7 +171,7 @@ export function ActivityPanel({ state }: { state: StudioState }) {
                       {run.error ||
                         run.events.findLast((e) => e.type === 'result')?.reason ||
                         (run.status === 'succeeded'
-                          ? 'Jev reports the goal is complete. The device is yours.'
+                          ? 'The selected model reports completion. Check a fresh device observation to verify the result.'
                           : run.status === 'stopped'
                             ? 'The task has stopped. You can start a new goal.'
                             : `The agent stopped: ${(run.outcome || 'unknown').replaceAll('_', ' ')}.`)}
